@@ -1,5 +1,12 @@
 "use client";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Dialog from "../dialog";
 import { DialogStore } from "./menu-option-store";
 import { Preahvihear } from "next/font/google";
@@ -15,7 +22,7 @@ export type DialogOptions = {
 
 export const MenuOptionDialog = () => {
   const [history, setHistory] = useState<DialogOptions[][]>([]);
-
+  const dialogItemRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     return DialogStore.subscribe((opts) =>
       setHistory((prev) => [...prev, opts])
@@ -28,12 +35,31 @@ export const MenuOptionDialog = () => {
   const handleCancel = () => {
     setHistory((prev) => prev.slice(0, -1));
   };
+  function removeAllMenu(e: any) {
+    if (dialogItemRef.current && e.target.contains(dialogItemRef.current)) {
+      setHistory([])
+    }
+  }
+  useEffect(() => {
+    if (dialogItemRef.current) {
+      window.addEventListener("click", removeAllMenu);
+    }
+    console.log(history);
+
+    return () => {
+      if (dialogItemRef.current) {
+        window.removeEventListener("click", removeAllMenu);
+      }
+    };
+  }, [currentOptions]);
+
   return (
     <>
       <AnimatePresence>
-        {currentOptions && (
-          <Dialog>
-            {currentOptions.map((option, index) => {
+        {history && (
+          history.map((options,index)=>{
+            return <Dialog key={index} ref={dialogItemRef}>
+            {options.map((option, index) => {
               return (
                 <Dialog.Item
                   isDanger={option.isDanger}
@@ -57,6 +83,7 @@ export const MenuOptionDialog = () => {
               Cancel
             </Dialog.Item>
           </Dialog>
+          })
         )}
       </AnimatePresence>
     </>

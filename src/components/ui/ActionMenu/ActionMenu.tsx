@@ -14,6 +14,8 @@ import React, {
 } from "react";
 import { useActionMenu } from "./ActionMenuProvider";
 import { cn } from "@/libs";
+import { ActionMenuTrigger } from "./ActionMenuTrigger";
+import { Portal } from "../Portal";
 
 const ActionMenuProvider = createContext<{
   id: string | null;
@@ -47,7 +49,6 @@ const ActionMenu = ({ children }: { children: ReactNode }) => {
         triggerRect,
       }}
     >
-     
       {children}
     </ActionMenuProvider.Provider>
   );
@@ -88,13 +89,13 @@ const Trigger = ({ children }: { children: ReactNode }) => {
   }, [btnRef]);
 
   return (
-    <motion.button
+    <ActionMenuTrigger
       ref={btnRef}
       onMouseDown={onClick}
       className="bg-red-500 px-3 block max-w-md py-2"
     >
       {children}
-    </motion.button>
+    </ActionMenuTrigger>
   );
 };
 const Body = ({ children }: { children: ReactNode }) => {
@@ -111,7 +112,8 @@ const Body = ({ children }: { children: ReactNode }) => {
   }, [triggerRect]);
 
   return (
-    <AnimatePresence>
+    <Portal>
+      <AnimatePresence>
       {isActive && triggerRect && (
         <motion.div
           ref={targetRef}
@@ -130,6 +132,7 @@ const Body = ({ children }: { children: ReactNode }) => {
         </motion.div>
       )}
     </AnimatePresence>
+    </Portal>
   );
 };
 ActionMenu.Trigger = Trigger;

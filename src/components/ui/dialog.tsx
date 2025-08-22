@@ -1,29 +1,47 @@
 "use client";
 import { cn } from "@/libs";
-import { useEffect, useState } from "react";
+import {
+  forwardRef,
+  ForwardRefExoticComponent,
+  HTMLAttributes,
+  ReactNode,
+  RefAttributes,
+  useEffect,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
-import { motion } from "motion/react";
-const Dialog = ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) return null; // jangan render di server
-  return createPortal(
-    <motion.div role="dialog" className="fixed px-2 lg:px-0 flex items-center justify-center inset-0 bg-overlay-dialog">
-      <motion.div
-        initial={{ scale: 1.1, opacity: 0 }} // mulai transparan
-        animate={{ scale: 1, opacity: 1 }} // fade in
-        exit={{ scale: 1.1, opacity: 0 }} // fade out
-        transition={{ duration: 0.1 }} // cepat tapi halus
-        className="max-w-md flex-1 rounded-dialog-border-radius  bg-primary-background flex-col flex items-stretch align-middle shrink-0  mx-auto overflow-hidden"
-      >
-        {children}
-      </motion.div>
-    </motion.div>,
-    document.body
-  );
+import { HTMLMotionProps, motion } from "motion/react";
+import { Portal } from "./Portal";
+type DialogComponent = ForwardRefExoticComponent<
+  HTMLAttributes<HTMLDivElement> & RefAttributes<HTMLDivElement> & HTMLMotionProps
+> & {
+  Item: typeof DialogItem;
 };
+const Dialog = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+  ({ children, ...props }, ref) => {
+    return (
+      <Portal>
+        <motion.div
+          ref={ref}
+          role="dialog"
+          className="fixed px-2 lg:px-0 flex items-center justify-center inset-0 bg-overlay-dialog"
+          {...props}
+        >
+          <motion.div
+            initial={{ scale: 1.1, opacity: 0 }} // mulai transparan
+            animate={{ scale: 1, opacity: 1 }} // fade in
+            exit={{ scale: 1.1, opacity: 0 }} // fade out
+            transition={{ duration: 0.1 }} // cepat tapi halus
+            className="max-w-md flex-1 rounded-dialog-border-radius  bg-primary-background flex-col flex items-stretch align-middle shrink-0  mx-auto overflow-hidden"
+          >
+            {children}
+          </motion.div>
+        </motion.div>
+        ,
+      </Portal>
+    );
+  }
+) as DialogComponent;
 
 const DialogItem = ({
   isDanger,

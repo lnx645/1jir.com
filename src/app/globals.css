@@ -1,26 +1,139 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "./css/colors.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: red;
+
+  --color-button-borderless-background-disabled: rgb(
+    var(--onejir-colors-button-borderless-background--disabled)
+  );
+  --color-button-borderless-text: rgb(
+    var(--onejir-colors-button-borderless-text)
+  );
+  --color-button-borderless-text-disabled: rgb(
+    var(--onejir-colors-button-borderless-text--disabled)
+  );
+  --color-button-borderless-text-hover: rgb(
+    var(--onejir-colors-button-borderless-text--hover)
+  );
+  --color-button-borderless-text-pressed: rgb(
+    var(--onejir-colors-button-borderless-text--pressed)
+  );
+
+  --color-button-primary-background: rgb(
+    var(--onejir-colors-button-primary-background)
+  );
+  --color-button-primary-background-disabled: rgb(
+    var(--onejir-colors-button-primary-background--disabled)
+  );
+  --color-button-primary-background-hover: rgb(
+    var(--onejir-colors-button-primary-background--hover)
+  );
+  --color-button-primary-background-pressed: rgb(
+    var(--onejir-colors-button-primary-background--pressed)
+  );
+
+  --color-button-primary-link-text: rgb(
+    var(--onejir-colors-button-primary-link-text)
+  );
+  --color-button-primary-link-text-disabled: rgb(
+    var(--onejir-colors-button-primary-link-text--disabled)
+  );
+  --color-button-primary-link-text-hover: rgb(
+    var(--onejir-colors-button-primary-link-text--hover)
+  );
+  --color-button-primary-link-text-pressed: rgb(
+    var(--onejir-colors-button-primary-link-text--pressed)
+  );
+
+  --color-button-primary-text: rgb(var(--onejir-colors-button-primary-text));
+  --color-button-primary-text-disabled: var(
+    --onejir-colors-button-primary-text--disabled
+  );
+
+  --color-button-secondary-background: rgb(
+    var(--onejir-colors-button-secondary-background)
+  );
+  --color-button-secondary-background-disabled: rgb(
+    var(--onejir-colors-button-secondary-background--disabled)
+  );
+  --color-button-secondary-background-hover: rgb(
+    var(--onejir-colors-button-secondary-background--hover)
+  );
+  --color-button-secondary-background-pressed: rgb(
+    var(--onejir-colors-button-secondary-background--pressed)
+  );
+
+  --color-button-secondary-link-text: rgb(
+    var(--onejir-colors-button-secondary-link-text)
+  );
+  --color-button-secondary-link-text-disabled: rgb(
+    var(--onejir-colors-button-secondary-link-text--disabled)
+  );
+  --color-button-secondary-link-text-hover: rgb(
+    var(--onejir-colors-button-secondary-link-text--hover)
+  );
+  --color-button-secondary-link-text-pressed: rgb(
+    var(--onejir-colors-button-secondary-link-text--pressed)
+  );
+
+  --color-button-secondary-text: rgb(
+    var(--onejir-colors-button-secondary-text)
+  );
+  --color-button-secondary-text-disabled: rgb(
+    var(--onejir-colors-button-secondary-text--disabled)
+  );
+
+  --color-primary-background: rgb(var(--onejir-primary-background));
+  --color-onejir-banner-background: rgba(var(--onejir-banner-background));
+  --shadow-primary: 0px 4px 12px rgba(var(--web-always-black), 0.15);
+  --shadow-banner-primary: 0px 0px 24px rgba(var(--web-always-black), 0.08);
+  --color-elevated-background: rgb(var(--onejir-elevated-background));
+  --color-elevated-highlight-background: rgb(
+    var(--onejir-elevated-highlight-background)
+  );
+  --color-elevated-separator: rgb(var(--onejir-elevated-separator));
+  --color-focus-stroke: rgb(var(--onejir-focus-stroke));
+  --color-highlight-background: rgb(var(--onejir-highlight-background));
+  --color-hover-overlay: rgba(var(--onejir-hover-overlay));
+  --color-link: rgb(var(--onejir-link));
+  --color-primary-background: rgb(var(--onejir-primary-background));
+  --color-primary-icon: rgb(var(--onejir-primary-icon));
+  --color-primary-text: rgb(var(--onejir-primary-text));
+  --color-secondary-background: rgb(var(--onejir-secondary-background));
+  --color-secondary-button: rgb(var(--onejir-secondary-button));
+  --color-secondary-button-background: rgb(
+    var(--onejir-secondary-button-background)
+  );
+  --color-secondary-button-hover: rgb(var(--onejir-secondary-button-hover));
+  --color-secondary-text: rgb(var(--onejir-secondary-text));
+  --color-separator: rgb(var(--onejir-separator));
+  --color-stroke: rgb(var(--onejir-stroke));
+  --color-temporary-highlight: rgb(var(--onejir-temporary-highlight));
+  --color-tertiary-icon: rgb(var(--onejir-tertiary-icon));
+  --color-tertiary-text: rgb(var(--onejir-tertiary-text));
+  --color-post-separator: rgb(var(--post-separator));
+  --spacing-modal-padding: var(--modal-padding);
+  --radius-dialog-border-radius: var(--onejirds-dialog-border-radius);
+  --color-always-dark-overlay: var(--always-dark-overlay);
+  --color-overlay-dialog: var(--overlay-alpha-80);
+  --color-primary-button-pressed: var(--primary-button-pressed);
+  --font-weight-bold: var(--font-weight-system-bold);
+  --font-weight-medium: var(--font-weight-system-medium);
+  --font-weight-regular: var(--font-weight-system-regular);
+  --font-weight-light: var(--font-weight-system-light);
+  --font-weight-extra-bold: var(--font-weight-system-extra-bold);
+  --font-weight-extra-light: var(--font-weight-system-extra-light);
+  --color-option-presed:#0000001a;
+  --text-base: 14px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-primary: #ff0000; /* Dark mode primary color */
   }
 }
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-primary-background);
+  color: var(--color-primary-text);
 }

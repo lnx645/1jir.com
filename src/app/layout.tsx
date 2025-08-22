@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/contexts";
-import { DialogModal } from "@/components/ui/dialog-modal/dialog-modal";
 import { MenuOptionDialog } from "@/components/ui/MenuOptionDialog";
+import { ActionMenuProvider } from "@/components/ui/ActionMenu/ActionMenuProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,13 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" >
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>
-          <MenuOptionDialog/>
-            {children}
+          <MenuOptionDialog />
+          <ActionMenuProvider>{children}</ActionMenuProvider>
         </StoreProvider>
       </body>
     </html>

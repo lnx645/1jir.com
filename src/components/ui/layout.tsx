@@ -2,6 +2,8 @@ import { useAppDispatch, useAppSelector } from "@/hooks/store";
 import { RootState } from "@/libs/store";
 import { createSlice } from "@reduxjs/toolkit";
 import { ReactNode } from "react";
+import { useDialog } from "./dialog-modal/useDialog";
+import { UIDialogComponent } from "./dialog/dialog";
 
 interface layoutUISliceInterface {
   showBackButton: boolean;
@@ -23,7 +25,12 @@ export const layoutUISlice = createSlice({
 export const { setShowBackButton } = layoutUISlice.actions;
 
 const Layout = ({ children }: { children: ReactNode }) => {
-  return children;
+  return (
+    <>
+      <UIDialogComponent />
+      {children}
+    </>
+  );
 };
 const Main = ({ children }: { children: React.ReactNode }) => {
   return <div>{children}</div>;

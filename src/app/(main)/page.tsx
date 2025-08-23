@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { ActionMenu } from "@/components/ui/ActionMenu/ActionMenu";
 import Dialog from "@/components/ui/dialog";
+import { useDialog } from "@/components/ui/dialog-modal/useDialog";
 import Layout from "@/components/ui/layout";
 import { increment, selectCount } from "@/features";
 import { useAppDispatch, useAppSelector, useAppStore } from "@/hooks/store";
@@ -14,23 +15,17 @@ import React, { useEffect } from "react";
 export default function Home() {
   const store = useAppSelector(selectCount);
   const dispatch = useAppDispatch();
+  const [showDialog, RenderDialog] = useDialog();
 
   function dialog2() {
-    onec.notification.dialog([
-      {
-        text: "Delete",
-        hasSub: true,
-        onClick() {
-          dialog3(); // masuk step 3
-        },
+    showDialog({
+      title: "WKWKW",
+      id: "modalapp",
+      text: "Apaah anda yuakin ingin mehapus data ini?",
+      acceptTrigger() {
+        login();
       },
-      { text: "3223423", onClick: () => alert("Clicked: Share") },
-      { text: "Do4324324wnload", onClick: () => alert("Clicked: Download") },
-      { text: "Pr234324ofile", onClick: () => alert("Clicked: Profile") },
-      { text: "Se324324ttings", onClick: () => alert("Clicked: Settings") },
-      { text: "He3234324lp", onClick: () => alert("Clicked: Help") },
-      { text: "Log3242342out", onClick: () => alert("Clicked: Logout") },
-    ]);
+    });
   }
 
   function dialog3() {
@@ -42,29 +37,28 @@ export default function Home() {
   }
 
   function login() {
-    onec.notification.dialog([
-      {
-        hasSub: true,
-        text: "Silahkan login guys",
-        isDanger: true,
-        onClick() {
-          dialog2(); // masuk step 2
-        },
-      },
-      {
-        text: "Report",
-        isDanger: true,
-        onClick: () => alert("Clicked: Report"),
-      },
-      { text: "Edit", onClick: () => alert("Clicked: Edit") },
-      { text: "Delete", onClick: () => alert("Clicked: Delete") },
-      { text: "Share", onClick: () => alert("Clicked: Share") },
-      { text: "Download", onClick: () => alert("Clicked: Download") },
-      { text: "Profile", onClick: () => alert("Clicked: Profile") },
-      { text: "Settings", onClick: () => alert("Clicked: Settings") },
-      { text: "Help", onClick: () => alert("Clicked: Help") },
-      { text: "Logout", onClick: () => alert("Clicked: Logout") },
-    ]);
+    onec.notification.dialogv2.show({
+      content: [
+        <Dialog.Item
+          onClick={() => {
+            onec.notification.dialogv2.show({
+              contentLoading: true,
+              onAccept() {
+                alert("WKWKKW");
+              },
+              title: "Konfirmasi Sebelum data dihapus",
+              content: `Apakah anda yakin ingin melaporkan penguna @dadanhidayat?`,
+            });
+          }}
+          isDanger
+        >
+          Delete
+        </Dialog.Item>,
+        <Dialog.Item>Reposts</Dialog.Item>,
+        <Dialog.Item>Report</Dialog.Item>,
+        <Dialog.Item>Hide This Post</Dialog.Item>,
+      ],
+    });
   }
 
   return (
@@ -86,25 +80,26 @@ export default function Home() {
           <ActionMenu>
             <ActionMenu.Trigger>WKWKWK</ActionMenu.Trigger>
             <ActionMenu.Body>
-               <ActionMenu>
-            <ActionMenu.Trigger>WKWKWKs</ActionMenu.Trigger>
-            <ActionMenu.Body>
-              <div className="p-3">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos, at
-                velit aliquid quis quos autem! Asperiores voluptatem hic,
-                praesentium at autem molestiae earum reiciendis repudiandae iure
-                dolorem quos cum similique. Recusandae quos corporis nostrum
-                soluta repellendus culpa dicta cupiditate esse distinctio atque
-                quae ad iure mollitia quisquam enim nobis illum, voluptate autem
-                molestias voluptatibus perferendis! Voluptatum, ratione?
-                Impedit, quisquam sit. Nemo, iste earum assumenda necessitatibus
-                suscipit quidem modi temporibus libero est eligendi? Mollitia
-                vel officiis magni id fugiat voluptatum repellat repudiandae,
-                saepe nesciunt sapiente aperiam quaerat qui laboriosam ratione
-                enim.
-              </div>
-            </ActionMenu.Body>
-          </ActionMenu>
+              <ActionMenu>
+                <ActionMenu.Trigger>WKWKWKs</ActionMenu.Trigger>
+                <ActionMenu.Body>
+                  <div className="p-3">
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Eos, at velit aliquid quis quos autem! Asperiores voluptatem
+                    hic, praesentium at autem molestiae earum reiciendis
+                    repudiandae iure dolorem quos cum similique. Recusandae quos
+                    corporis nostrum soluta repellendus culpa dicta cupiditate
+                    esse distinctio atque quae ad iure mollitia quisquam enim
+                    nobis illum, voluptate autem molestias voluptatibus
+                    perferendis! Voluptatum, ratione? Impedit, quisquam sit.
+                    Nemo, iste earum assumenda necessitatibus suscipit quidem
+                    modi temporibus libero est eligendi? Mollitia vel officiis
+                    magni id fugiat voluptatum repellat repudiandae, saepe
+                    nesciunt sapiente aperiam quaerat qui laboriosam ratione
+                    enim.
+                  </div>
+                </ActionMenu.Body>
+              </ActionMenu>
               <div className="p-3">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos, at
                 velit aliquid quis quos autem! Asperiores voluptatem hic,

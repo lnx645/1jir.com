@@ -13,15 +13,22 @@ import { createPortal } from "react-dom";
 import { HTMLMotionProps, motion } from "motion/react";
 import { Portal } from "./Portal";
 type DialogComponent = ForwardRefExoticComponent<
-  HTMLAttributes<HTMLDivElement> & RefAttributes<HTMLDivElement> & HTMLMotionProps
+  HTMLAttributes<HTMLDivElement> & RefAttributes<HTMLDivElement>
 > & {
   Item: typeof DialogItem;
 };
 const Dialog = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ children, ...props }, ref) => {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+      setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
     return (
       <Portal>
-        <motion.div
+        <div
           ref={ref}
           role="dialog"
           className="fixed px-2 lg:px-0 flex items-center justify-center inset-0 bg-overlay-dialog"
@@ -32,11 +39,11 @@ const Dialog = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
             animate={{ scale: 1, opacity: 1 }} // fade in
             exit={{ scale: 1.1, opacity: 0 }} // fade out
             transition={{ duration: 0.1 }} // cepat tapi halus
-            className="max-w-md flex-1 rounded-dialog-border-radius  bg-primary-background flex-col flex items-stretch align-middle shrink-0  mx-auto overflow-hidden"
+            className="max-w-xs lg:max-w-sm flex-1 rounded-dialog-border-radius  bg-primary-background backdrop-blur-2xl flex-col flex items-stretch align-middle shrink-0  mx-auto overflow-hidden"
           >
             {children}
           </motion.div>
-        </motion.div>
+        </div>
         ,
       </Portal>
     );
@@ -47,7 +54,9 @@ const DialogItem = ({
   isDanger,
   children,
   onClick,
+  className
 }: {
+  className? : string,
   children: React.ReactNode;
   isDanger?: boolean;
   onClick?: () => void;
@@ -58,7 +67,7 @@ const DialogItem = ({
       className={cn(
         "border-t-[1px] first:border-t-0  active:bg-option-presed text-base text-primary-text border-elevated-separator min-h-[48px] cursor-pointer px-[4px] py-[8px] text-center select-none",
         isDanger && "text-red-500 font-bold"
-      )}
+      ,className)}
     >
       <motion.div whileTap={{ scale: 0.95 }}>{children}</motion.div>
     </motion.button>

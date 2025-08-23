@@ -1,11 +1,21 @@
-import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  Fragment,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { v4 } from "uuid";
 import Dialog from "../dialog";
 import { AnimatePresence } from "motion/react";
 import IosSpinner from "../IosSpinner";
+import { Portal } from "../Portal";
 
 type DialogOptions = {
   id?: string;
+  asChild?: boolean;
   contentLoading?: boolean;
   onAccept?: () => void;
   title?: string;
@@ -33,6 +43,7 @@ export const dialog = {
 
 const UIDialogComponent = () => {
   const [dialogs, setDialogs] = useState<DialogOptions[]>([]);
+  const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     return dialog.subscribe((opts) =>
       setDialogs((e) => {
@@ -66,7 +77,11 @@ const UIDialogComponent = () => {
     return dialogs[dialogs.length - 1];
   }, [dialogs]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (current && dialogRef.current) {
+      console.log(dialogRef.current);
+    }
+
     if (current) {
       window.document.body.style.overflow = "hidden";
     }
@@ -76,41 +91,60 @@ const UIDialogComponent = () => {
       }
     };
   }, [current]);
+  console.log(dialogRef);
 
+  function hidden() {
+    setDialogs([]);
+  }
   return (
     <AnimatePresence>
       {current && (
-        <Dialog key={current.id}>
-          {current.contentLoading ? (
-            <div className="py-4 flex border items-center space-x-2 flex-col justify-center">
-                <IosSpinner size={17}/>
-                <span className="text-sm">Loading...</span>
-            </div>
-          ) : (
-            <>
-              {current.title && (
-                <div className="p-4 text-center flex items-center justify-center">
-                  <span className="text-2xl">{current.title}</span>
-                </div>
-              )}
-              {renderContent(current.content)}
-              {current.onAccept && (
-                <Dialog.Item className="mt-4" onClick={current.onAccept}>
-                  Accept
-                </Dialog.Item>
-              )}
-            </>
-          )}
-
-          <Dialog.Item
-            isDanger
-            onClick={() => {
-              closeDialog(current.id as string);
+        <>
+          <Portal>
+            <div
+              onClick={hidden}
+              className="w-full fixed inset-0 h-full bg-overlay-dialog"
+            ></div>
+          </Portal>
+          <Dialog
+            ref={(e) => {
+              if (current) {
+                dialogRef.current = e;
+              }
             }}
+            key={current.id}
           >
-            Close
-          </Dialog.Item>
-        </Dialog>
+            {current.contentLoading ? (
+              <div className="py-4 flex  items-center space-x-2 flex-col justify-center">
+                <IosSpinner size={17} />
+                <span className="text-sm">Loading...</span>
+              </div>
+            ) : (
+              <>
+                {current.title && (
+                  <div className="p-4 text-center flex items-center justify-center">
+                    <span className="text-2xl">{current.title}</span>
+                  </div>
+                )}
+                {renderContent(current.content)}
+                {current.onAccept && (
+                  <Dialog.Item className="mt-4" onClick={current.onAccept}>
+                    Accept
+                  </Dialog.Item>
+                )}
+              </>
+            )}
+
+            <Dialog.Item
+              isDanger
+              onClick={() => {
+                closeDialog(current.id as string);
+              }}
+            >
+              {current.asChild ? "Back" : "Close"}
+            </Dialog.Item>
+          </Dialog>
+        </>
       )}
     </AnimatePresence>
   );

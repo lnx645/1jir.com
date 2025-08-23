@@ -17,7 +17,7 @@ type DialogComponent = ForwardRefExoticComponent<
 > & {
   Item: typeof DialogItem;
 };
-const Dialog = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+const Dialog = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   ({ children, ...props }, ref) => {
     const [mounted, setMounted] = useState(false);
 
@@ -28,22 +28,18 @@ const Dialog = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     if (!mounted) return null;
     return (
       <Portal>
-        <div
-          ref={ref}
+        <motion.div
           role="dialog"
-          className="fixed px-2 lg:px-0 flex items-center justify-center inset-0 bg-overlay-dialog"
+          ref={ref}
+          initial={{ scale: 1.1, opacity: 0 }} // mulai transparan
+          animate={{ scale: 1, opacity: 1 }} // fade in
+          exit={{ scale: 1.1, opacity: 0 }} // fade out
+          transition={{ duration: 0.1 }} // cepat tapi halus
+          className="max-w-xs top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 w-full mx-auto fixed z-50 lg:max-w-sm flex-1 rounded-dialog-border-radius  bg-primary-background backdrop-blur-2xl flex-col flex items-stretch align-middle shrink-0  overflow-hidden"
           {...props}
         >
-          <motion.div
-            initial={{ scale: 1.1, opacity: 0 }} // mulai transparan
-            animate={{ scale: 1, opacity: 1 }} // fade in
-            exit={{ scale: 1.1, opacity: 0 }} // fade out
-            transition={{ duration: 0.1 }} // cepat tapi halus
-            className="max-w-xs lg:max-w-sm flex-1 rounded-dialog-border-radius  bg-primary-background backdrop-blur-2xl flex-col flex items-stretch align-middle shrink-0  mx-auto overflow-hidden"
-          >
-            {children}
-          </motion.div>
-        </div>
+          {children}
+        </motion.div>
         ,
       </Portal>
     );
@@ -54,20 +50,22 @@ const DialogItem = ({
   isDanger,
   children,
   onClick,
-  className
+  className,
 }: {
-  className? : string,
+  className?: string;
   children: React.ReactNode;
   isDanger?: boolean;
   onClick?: () => void;
 }) => {
   return (
     <motion.button
+      autoFocus
       onClick={onClick}
       className={cn(
-        "border-t-[1px] first:border-t-0  active:bg-option-presed text-base text-primary-text border-elevated-separator min-h-[48px] cursor-pointer px-[4px] py-[8px] text-center select-none",
-        isDanger && "text-red-500 font-bold"
-      ,className)}
+        "border-t-[1px] focus-within:outline-1 focus-within:outline-primary outline-none focus-within:text-secondary-text first:border-t-0  active:bg-option-presed text-base text-primary-text border-elevated-separator min-h-[48px] cursor-pointer px-[4px] py-[8px] text-center select-none",
+        isDanger && "text-red-500 font-bold",
+        className
+      )}
     >
       <motion.div whileTap={{ scale: 0.95 }}>{children}</motion.div>
     </motion.button>

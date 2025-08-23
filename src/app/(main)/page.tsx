@@ -2,65 +2,10 @@
 export const dynamic = "force-dynamic";
 
 import { ActionMenu } from "@/components/ui/ActionMenu/ActionMenu";
-import Dialog from "@/components/ui/dialog";
-import { useDialog } from "@/components/ui/dialog-modal/useDialog";
 import Layout from "@/components/ui/layout";
-import { increment, selectCount } from "@/features";
-import { useAppDispatch, useAppSelector, useAppStore } from "@/hooks/store";
-import { cn } from "@/libs";
-import { onec } from "@/libs/onejir";
-import { dialog } from "motion/react-client";
 import React, { useEffect } from "react";
 
 export default function Home() {
-  const store = useAppSelector(selectCount);
-  const dispatch = useAppDispatch();
-  const [showDialog, RenderDialog] = useDialog();
-
-  function dialog2() {
-    showDialog({
-      title: "WKWKW",
-      id: "modalapp",
-      text: "Apaah anda yuakin ingin mehapus data ini?",
-      acceptTrigger() {
-        login();
-      },
-    });
-  }
-
-  function dialog3() {
-    onec.notification.dialog([
-      { text: "Set2tin234324gs", onClick: () => alert("Clicked: Settings") },
-      { text: "H23el234324p", onClick: () => alert("Clicked: Help") },
-      { text: "Log3243243242out", onClick: () => alert("Clicked: Logout") },
-    ]);
-  }
-
-  function login() {
-    onec.notification.dialogv2.show({
-      content: [
-        <Dialog.Item
-          onClick={() => {
-            onec.notification.dialogv2.show({
-              contentLoading: true,
-              onAccept() {
-                alert("WKWKKW");
-              },
-              title: "Konfirmasi Sebelum data dihapus",
-              content: `Apakah anda yakin ingin melaporkan penguna @dadanhidayat?`,
-            });
-          }}
-          isDanger
-        >
-          Delete
-        </Dialog.Item>,
-        <Dialog.Item>Reposts</Dialog.Item>,
-        <Dialog.Item>Report</Dialog.Item>,
-        <Dialog.Item>Hide This Post</Dialog.Item>,
-      ],
-    });
-  }
-
   return (
     <Layout>
       <Layout.Main>
@@ -74,8 +19,6 @@ export default function Home() {
         adipisci dolorem. Vel quia ducimus, consequuntur incidunt ipsum eligendi
         facere illum laudantium voluptas, vitae aliquam maiores dolor officiis!
         Fugit facere ut quaerat voluptatibus voluptatem!
-        <button onClick={login}>Login</button>
-        <button onClick={dialog2}>Login</button>
         <div className="space-y-4">
           <ActionMenu>
             <ActionMenu.Trigger>WKWKWK</ActionMenu.Trigger>

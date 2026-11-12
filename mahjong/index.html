@@ -2,204 +2,166 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Mahjong DSRI - PixiJS</title>
+<title>Mahjong DSRI (PixiJS)</title>
 <style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    background: #0f0f1a;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  #info {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: #fff;
-    font-size: 18px;
-    pointer-events: none;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
-  canvas {
-    display: block;
-  }
-  #hint {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #aaa;
-    font-size: 14px;
-    pointer-events: none;
-  }
+  body { margin:0; overflow:hidden; font-family:Arial, sans-serif; background:#0a0a1a; }
+  #info { position:absolute; top:10px; left:10px; color:#fff; font-size:16px; pointer-events:none; }
+  canvas { display:block; }
 </style>
 </head>
 <body>
-<div id="info">Mahjong DSRI</div>
-<div id="hint">Klik tile untuk memilih &nbsp;|&nbsp; Klik 2 tile yang sama untuk mencocok</div>
+<div id="info">Mahjong DSRI – Klik dua tile yang sama untuk cocok!</div>
 <script type="module">
   import * as PIXI from 'https://cdn.jsdelivr.net/npm/pixi.js@7.2.12/dist/pixi-core.production.min.js';
 
-  // ── Konfigurasi ──────────────────────────────────────────────
-  const TILE_SIZE = 80;          // Ukuran tile
-  const ROWS = 6;                // Baris
-  const COLS = 6;                // Kolom
-  const GRID_PAD = 4;            // Jarak antar tile
-  const COLORS = {
-    RED:    '#E53935',   // Merah
-    GREEN:  '#43A047',   // Hijau
-    WHITE:  '#FDD835',   // Putih
-  };
+  // ── Setup aplikasi ──────────────────────────────────────────
+  const APP = new PIXI.Application({ width: window.innerWidth, height: window.innerHeight, antialias: true, backgroundColor: '#0a0a1a' });
+  document.body.appendChild(APP.view);
 
-  // Suit mapping: row % 3 -> suit
-  const SUIT = ['R', 'G', 'W'];
+  // ── Konfigurasi tile ────────────────────────────────────────
+  const TILE_SIZE = 70;
+  const ROWS = 6;
+  const COLS = 6;
+  const GAP = 5;
+  const SUITS = ['R', 'G', 'W'];
+  const COLORS = { R: '#E53935', G: '#43A047', W: '#FDD835' };
 
-  // ── Tile Factory ──────────────────────────────────────────────
-  function makeTile(row, col, value, suit) {
-    const g = new PIXI.Graphics();
-    // Background (rounded)
-    g.beginFill(COLORS[suit] || '#fff');
-    g.drawRoundRect(0, 0, TILE_SIZE, TILE_SIZE, 8, 8);
+  // Fungsi untuk membuat tile visual
+  function createTile(row, col, value, suit) {
+    const container = new PIXI.Container();
+    container.position.set(
+      col * (TILE_SIZE + GAP) + GAP,
+      row * (TILE_SIZE + GAP) + GAP
+    );
+
+    // Background
+    const bg = new PIXI.Graphics();
+    bg.beginFill(COLORS[suit] || '#FFFFFF');
+    bg.drawRoundRect(0, 0, TILE_SIZE, TILE_SIZE, 6);
+    bg.endFill();
+    container.addChild(bg);
+
     // Number
-    g.beginFill('#fff');
-    g.drawText(String(value), TILE_SIZE / 2, TILE_SIZE / 2, 24);
-    g.endFill();
-    return g;
+    const txt = new PIXI.Text(String(value), { fontSize: 24, fill: '#FFFFFF', fontWeight: 'bold', align: 'center' });
+    txt.x = TILE_SIZE / 2 - txt.width / 2;
+    txt.y = TILE_SIZE / 2 - txt.height / 2;
+    container.addChild(txt);
+
+    // Store tile metadata
+    container.tileMeta = { row, col, value, suit, id: `${row}-${col}-${value}-${suit}` };
+
+    return container;
   }
 
-  // ── Membuat Tiles ─────────────────────────────────────────────
+  // ── Membuat tiles ───────────────────────────────────────────
   const tiles = [];
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      const value = ((r + c) % 9) + 1; // 1-9
-      const suit = SUIT[r % 3];
-      const tile = makeTile(r, c, value, suit);
-      tiles.push({ el: tile, r, c, value, suit });
+      const value = ((r + c) % 9) + 1; // angka 1..9
+      const suit = SUITS[r % 3];
+      const tile = createTile(r, c, value, suit);
+      tiles.push(tile);
+      APP.stage.addChild(tile);
     }
   }
-  // Blank tiles (0) – tidak berwarna, hanya background
-  for (let i = 0; i < ROWS * COLS; i++) {
-    tiles.push({ el: null, r: i / COLS, c: 0, value: 0, suit: '?' });
+
+  // ── Manajemen state ──────────────────────────────────────────
+  let selected = new Set();   // akan menyimpan container tile yang dipilih
+
+  function isSelected(tile) {
+    return selected.has(tile.tileMeta.id);
   }
 
-  // ── Container ─────────────────────────────────────────────────
-  const container = new PIXI.Container();
-  tiles.forEach(t => {
-    if (t.el) {
-      t.el.position.set(t.c * (TILE_SIZE + GRID_PAD) + GRID_PAD, t.r * (TILE_SIZE + GRID_PAD) + GRID_PAD);
-      container.addChild(t.el);
-    } else {
-      // Blank placeholder
-      const g = new PIXI.Graphics();
-      g.beginFill('#555');
-      g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
-      g.endFill();
-      container.addChild(g);
+  function selectTile(tile) {
+    if (!selected.has(tile.tileMeta.id)) {
+      selected.add(tile.tileMeta.id);
+      tile.scale.set(1.1); // highlight
     }
-  });
+  }
 
-  // ── App ───────────────────────────────────────────────────────
-  const app = new PIXI.Application({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    antialias: true,
-    backgroundColor: '#0f0f1a',
-  });
-  document.body.appendChild(app.view);
-
-  // ── Interaksi Klik ────────────────────────────────────────────
-  let selectedIds = new Set();
-  let lastSelected = null;
-
-  window.addEventListener('click', (e) => {
-    const pos = e.target.getWorldPosition();
-    // Cari tile terdekat dengan klik
-    for (const t of tiles) {
-      if (t.el) {
-        const tilePos = t.el.position;
-        if (Math.abs(tilePos.x - pos.x) < 20 && Math.abs(tilePos.y - pos.y) < 20) {
-          t.el.selected = true;
-          selectedIds.add(t.id);
-          break;
-        }
-      }
+  function deselectTile(tile) {
+    if (selected.has(tile.tileMeta.id)) {
+      selected.delete(tile.tileMeta.id);
+      tile.scale.set(1.0);
     }
-  });
+  }
 
-  // ── Deteksi Pasangan & Animasi ────────────────────────────────
-  function checkMatch() {
-    // Jika ada 2 atau lebih tile yang sama dalam selectedIds
-    const values = [];
-    for (const id of selectedIds) {
-      const t = tiles.find(t => t.id === id);
-      if (t) values.push(t.value);
-    }
-    // Cek pasangan (2 tile sama)
-    const freq = {};
-    for (const v of values) freq[v] = (freq[v] || 0) + 1;
-    const pairs = Object.entries(freq).filter(([k, n]) => n >= 2);
-    if (pairs.length > 0) {
-      // Hapus satu tile dari setiap pasangan
-      for (const [val, count] of Object.entries(freq)) {
-        if (count >= 2) {
-          // Hapus tile pertama dari pasangan
-          const idx = tiles.findIndex(t => t.value === val && t.el && t.el.selected);
-          if (idx !== -1) {
-            const tile = tiles[idx];
-            tile.el.visible = false;
-            tile.el.animate({
-              opacity: 0,
-              duration: 300,
-              onComplete: () => {
-                // Restore jika ada lagi tile yang sama
-                if (selectedIds.has(tile.id)) {
-                  selectedIds.delete(tile.id);
-                }
-              }
-            });
+  // Event klik
+  APP.stage.interactive = true;
+  APP.stage.on('pointerdown', (event) => {
+    const clickPos = event.getWorldPosition();
+    // Cari tile yang tepat
+    for (const tile of tiles) {
+      if (!tile.tileMeta || !tile.tileMeta.id) continue;
+      const meta = tile.tileMeta;
+      const tileCenterX = meta.col * (TILE_SIZE + GAP) + GAP + TILE_SIZE / 2;
+      const tileCenterY = meta.row * (TILE_SIZE + GAP) + GAP + TILE_SIZE / 2;
+      const distance = Math.hypot(clickPos.x - tileCenterX, clickPos.y - tileCenterY);
+      if (distance <= TILE_SIZE / 2 + 5) {
+        // Toggle
+        if (isSelected(tile)) {
+          deselectTile(tile);
+        } else {
+          selectTile(tile);
+          // Jika ada 2, cek match
+          if (selected.size >= 2) {
+            const selectedTiles = Array.from(selected).map(id => tiles.find(t => t.tileMeta.id === id));
+            const [a, b] = selectedTiles;
+            if (a && b && a.tileMeta.value === b.tileMeta.value && a.tileMeta.suit === b.tileMeta.suit) {
+              // Cocok! Hapus dengan animasi fade out
+              animateFadeOut(a);
+              animateFadeOut(b);
+            } else {
+              // Tidak cocok, deselect semua
+              selected.forEach(id => deselectTile(tiles.find(t => t.tileMeta.id === id)));
+              selected.clear();
+            }
           }
         }
+        break; // hanya proses satu tile per klik
       }
     }
-  }
+  });
 
-  function updateUI() {
-    // Hover effect pada tile yang tidak terpilih
-    container.children.forEach(child => {
-      if (child.el && !child.el.selected) {
-        child.el.animate({
-          scale: 1.1,
-          duration: 150,
-          onComplete: () => child.el.animate({
-            scale: 1,
-            duration: 100
-          })
-        });
+  // Hover effect
+  tiles.forEach(tile => {
+    tile.interactive = true;
+    tile.on('pointerover', () => {
+      if (!isSelected(tile)) {
+        tile.scale.set(1.1);
       }
     });
-  }
-
-  // Pulsing effect pada tile yang terpilih
-  function pulseSelected() {
-    selectedIds.forEach(id => {
-      const t = tiles.find(t => t.id === id);
-      if (t) t.el.animate({
-        scale: 1.15,
-        duration: 200,
-        onComplete: () => t.el.animate({
-          scale: 1,
-          duration: 100
-        })
-      });
+    tile.on('pointerout', () => {
+      if (!isSelected(tile)) {
+        tile.scale.set(1.0);
+      }
     });
+  });
+
+  // Animasi fade out
+  function animateFadeOut(tile) {
+    let alpha = 1.0;
+    const interval = setInterval(() => {
+      alpha -= 0.05;
+      if (alpha <= 0) {
+        tile.alpha = 0;
+        tile.visible = false;
+        clearInterval(interval);
+      } else {
+        tile.alpha = alpha;
+      }
+    }, 16); // ~60fps
   }
 
-  // ── Loop Animasi ──────────────────────────────────────────────
-  function tick() {
-    checkMatch();
-    updateUI();
-    requestAnimationFrame(tick);
-  }
-  tick();
+  // Hover effect dengan animasi halus
+  tiles.forEach(tile => {
+    tile.on('pointerover', () => {
+      tile.animate({ scale: 1.1, duration: 100, onComplete: () => {} });
+    });
+    tile.on('pointerout', () => {
+      tile.animate({ scale: 1.0, duration: 100 });
+    });
+  });
 </script>
 </body>
 </html>
